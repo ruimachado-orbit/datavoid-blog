@@ -1,0 +1,6 @@
+anthropic>=0.40
+feedparser>=6.0
+pyyaml>=6.0
+python-frontmatter>=1.1
+qdrant-client>=1.9   # optional, scale path
+temporalio>=1.6      # optional, scale path

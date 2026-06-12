@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATAVOID — drops every 72h</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#07090E; --surface:#0E131C; --surface-2:#131A26; --line:#1B2330;
+  --text:#E9EDF4; --muted:#8893A5;
+  /* topic coding: recognition beats reading */
+  --c-infra:#3CE0E0;   /* inference & infra */
+  --c-agents:#A06CFF;  /* agentic systems  */
+  --c-data:#B8F535;    /* data engineering */
+  --c-mgmt:#FFB23C;    /* management       */
+  --hot:#FF5C5C;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.55;overflow-x:hidden}
+.wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--c-infra);outline-offset:3px;border-radius:6px}
+
+/* ── top bar ───────────────────────────── */
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(7,9,14,.86);backdrop-filter:blur(10px);z-index:10}
+.mark{display:flex;align-items:center;gap:11px}
+.mark .dv{width:32px;height:32px;border-radius:9px;background:var(--c-infra);color:var(--void);font-family:'Syne',sans-serif;font-weight:800;display:grid;place-items:center;font-size:14px}
+.mark span{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;letter-spacing:.04em}
+.streak{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;background:var(--surface)}
+.streak b{font-family:'JetBrains Mono',monospace;color:var(--c-infra)}
+.streak .flame{filter:saturate(1.2)}
+
+/* ── latest drop hero ──────────────────── */
+.hero{padding:46px 0 18px}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--c-infra);animation:pulse 2.2s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.drop{
+  border:1px solid var(--line);border-radius:20px;overflow:hidden;
+  background:linear-gradient(160deg,var(--surface-2),var(--surface) 55%);
+  display:grid;grid-template-columns:1.6fr 1fr;
+}
+.drop-main{padding:36px 38px}
+.chip{display:inline-flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.chip .sw{width:8px;height:8px;border-radius:3px}
+.drop h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(30px,4.6vw,48px);line-height:1.04;letter-spacing:-.015em;margin:16px 0 12px}
+.drop p.sub{color:var(--muted);font-size:15px;max-width:52ch}
+.lanes{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.lane{
+  display:flex;flex-direction:column;gap:2px;border-radius:14px;padding:14px 20px;
+  border:1px solid var(--line);transition:transform .2s,border-color .2s;text-align:left;
+}
+.lane:hover{transform:translateY(-2px)}
+.lane.fast{background:var(--c-infra);color:var(--void);border-color:transparent}
+.lane .big{font-weight:700;font-size:15px}
+.lane .small{font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.75}
+.lane.deep:hover{border-color:var(--c-infra)}
+
+/* countdown panel */
+.drop-side{border-left:1px solid var(--line);padding:32px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.ringbox{position:relative;width:150px;height:150px}
+.ringbox svg{transform:rotate(-90deg)}
+.ringbox .base{stroke:var(--line)}
+.ringbox .prog{stroke:var(--c-infra);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.ringbox.hot .prog{stroke:var(--hot)}
+.ringbox .mid{position:absolute;inset:0;display:grid;place-items:center;flex-direction:column}
+.ringbox .mid .t{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:19px;font-variant-numeric:tabular-nums}
+.ringbox .mid .l{font-size:10.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+.drop-side .note{font-size:12px;color:var(--muted);max-width:20ch}
+
+/* ── deck rail (the fast lane) ─────────── */
+.deck-sec{padding:40px 0 8px}
+.deck-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+.deck-head h2{font-family:'Syne',sans-serif;font-weight:700;font-size:19px}
+.dots{display:flex;gap:7px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .2s,transform .2s}
+.dots i.on{background:var(--c-infra);transform:scale(1.3)}
+.deck{
+  display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:4px 4px 22px;scrollbar-width:none;
+}
+.deck::-webkit-scrollbar{display:none}
+.card{
+  scroll-snap-align:center;flex:0 0 min(420px,86vw);min-height:300px;
+  border:1px solid var(--line);border-radius:18px;background:var(--surface);
+  padding:26px;display:flex;flex-direction:column;position:relative;
+}
+.card .kind{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-infra)}
+.card .secs{position:absolute;top:22px;right:22px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+.card h3{font-family:'Syne',sans-serif;font-weight:700;font-size:26px;line-height:1.12;letter-spacing:-.01em;margin:14px 0 10px}
+.card p{color:var(--muted);font-size:15.5px}
+.card .stat{margin-top:auto;padding-top:18px}
+.card .stat .v{font-family:'Syne',sans-serif;font-weight:800;font-size:46px;color:var(--c-infra);line-height:1}
+.card .stat .l{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
+.card pre{
+  margin-top:auto;background:var(--void);border:1px solid var(--line);border-radius:10px;
+  padding:14px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--c-infra);overflow-x:auto;
+}
+.card.cta{background:var(--c-infra);border-color:transparent;color:var(--void)}
+.card.cta .kind,.card.cta p{color:rgba(7,9,14,.72)}
+.card.cta .secs{color:rgba(7,9,14,.6);border-color:rgba(7,9,14,.25)}
+.card.cta .go{margin-top:auto;align-self:flex-start;background:var(--void);color:var(--text);border-radius:11px;padding:12px 18px;font-weight:600;font-size:14px}
+
+/* ── missed drops ──────────────────────── */
+.missed{padding:38px 0 8px}
+.missed .bar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.badge{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--hot);color:var(--void);border-radius:999px;padding:4px 11px;font-weight:700}
+.missed h2{font-family:'Syne',sans-serif;font-weight:700;font-size:19px}
+.missed .hint{font-size:12.5px;color:var(--muted);margin-left:auto}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mcard{border:1px solid var(--line);border-radius:16px;padding:20px 22px;background:var(--surface);opacity:.92;transition:border-color .2s}
+.mcard:hover{border-color:var(--c-agents)}
+.mcard.data:hover{border-color:var(--c-data)}
+.mcard .meta{display:flex;gap:10px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-bottom:9px}
+.mcard h3{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;line-height:1.25}
+.mcard .recap{margin-top:8px;font-size:13.5px;color:var(--muted)}
+.mcard .recap b{color:var(--text);font-weight:600}
+.catchup{margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--c-infra)}
+
+/* ── vault ─────────────────────────────── */
+.vault{padding:42px 0}
+.vault h2{font-family:'Syne',sans-serif;font-weight:700;font-size:19px;margin-bottom:4px}
+.vault .sub{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+.vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.vcard{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:transparent;opacity:.62;transition:opacity .2s}
+.vcard:hover{opacity:1}
+.vcard .meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:7px;display:flex;gap:8px;align-items:center}
+.vcard h3{font-size:14.5px;font-weight:600;line-height:1.3}
+
+/* ── manifesto / footer ────────────────── */
+.manifesto{border-radius:18px;background:var(--c-infra);color:var(--void);padding:42px;margin:30px 0 50px}
+.manifesto h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(24px,3.6vw,36px);line-height:1.08;max-width:24ch}
+.manifesto p{margin-top:12px;font-weight:500;font-size:14.5px;max-width:60ch}
+footer{padding:24px 0 46px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12px;color:var(--muted);flex-wrap:wrap;gap:8px}
+
+@media(max-width:860px){
+  .drop{grid-template-columns:1fr}
+  .drop-side{border-left:none;border-top:1px solid var(--line);padding:24px}
+  .mgrid,.vgrid{grid-template-columns:1fr}
+  .drop-main{padding:26px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <a class="mark" href="#"><span class="dv">DV</span><span>DATAVOID</span></a>
+  <div class="streak" role="status" aria-label="Reader streak">
+    <span class="flame">🔥</span><span>streak</span><b id="streak">4</b><span class="mono" style="color:var(--muted);font-size:11px">drops</span>
+  </div>
+</header>
+
+<!-- LATEST DROP -->
+<section class="hero">
+  <div class="eyebrow"><span class="dot"></span> latest drop · dv-2026-06-12-a3f1 · written by the pipeline, signed by rui</div>
+  <article class="drop">
+    <div class="drop-main">
+      <span class="chip"><span class="sw" style="background:var(--c-infra)"></span> moe-inference</span>
+      <h1>Streaming experts: running MoE models under 16GB of VRAM</h1>
+      <p class="sub">Your GPU is hoarding parameters it never activates. Treat the expert layer as a streaming problem and the wall moves.</p>
+      <div class="lanes">
+        <a class="lane fast" href="#deck"><span class="big">Cards</span><span class="small">6 cards · under 2 min</span></a>
+        <a class="lane deep" href="#"><span class="big">Full essay</span><span class="small">7 honest minutes</span></a>
+      </div>
+    </div>
+    <div class="drop-side">
+      <div class="ringbox" id="ringbox">
+        <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true">
+          <circle class="base" cx="75" cy="75" r="66" fill="none" stroke-width="7"/>
+          <circle class="prog" id="ring" cx="75" cy="75" r="66" fill="none" stroke-width="7"/>
+        </svg>
+        <div class="mid"><div><div class="t" id="cd">41:23:09</div><div class="l">still fresh</div></div></div>
+      </div>
+      <p class="note">When this hits zero, the pipeline writes the next one.</p>
+    </div>
+  </article>
+</section>
+
+<!-- FAST LANE: the deck -->
+<section class="deck-sec" id="deck">
+  <div class="deck-head">
+    <h2>The fast lane</h2>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+  </div>
+  <div class="deck" id="deckRail" tabindex="0" aria-label="Card deck, scroll horizontally">
+
+    <article class="card">
+      <span class="kind">hook</span><span class="secs">15s</span>
+      <h3>Your GPU is hoarding</h3>
+      <p>A 12B MoE model activates 3B parameters per token. The other 9B sit in VRAM doing nothing. That is the bug.</p>
+    </article>
+
+    <article class="card">
+      <span class="kind">core idea</span><span class="secs">20s</span>
+      <h3>Experts are a stream</h3>
+      <p>Treat expert weights as data in flight, not furniture. Keep the router and attention on GPU, stream experts from RAM on demand.</p>
+    </article>
+
+    <article class="card">
+      <span class="kind">evidence</span><span class="secs">15s</span>
+      <h3>The numbers</h3>
+      <p>Gemma-class MoE on a 16GB card: full GPU placement fails. Expert streaming runs at usable interactive speed.</p>
+      <div class="stat"><div class="v">16GB</div><div class="l">is enough</div></div>
+    </article>
+
+    <article class="card">
+      <span class="kind">try it</span><span class="secs">20s</span>
+      <h3>One flag to start</h3>
+      <p>llama.cpp already ships the primitive.</p>
+      <pre>./llama-server -m model.gguf --cpu-moe</pre>
+    </article>
+
+    <article class="card">
+      <span class="kind">takeaway</span><span class="secs">20s</span>
+      <h3>Placement is a choice</h3>
+      <p>VRAM limits stop being a wall when you stop treating model layout as fixed. Routing locality decides what deserves the GPU.</p>
+    </article>
+
+    <article class="card cta">
+      <span class="kind">your call</span><span class="secs">5s</span>
+      <h3>Want the full picture?</h3>
+      <p>The essay covers prefetch heuristics, expert cache hit rates and where this breaks.</p>
+      <a class="go" href="#">Read the essay · 7 min</a>
+    </article>
+
+  </div>
+</section>
+
+<!-- MISSED DROPS -->
+<section class="missed">
+  <div class="bar">
+    <span class="badge">2 missed</span>
+    <h2>While you were away</h2>
+    <span class="hint">one line each, then you are caught up</span>
+  </div>
+  <div class="mgrid">
+    <a class="mcard" href="#">
+      <div class="meta"><span class="sw" style="width:8px;height:8px;border-radius:3px;background:var(--c-agents)"></span><span>agentic</span><span>·</span><span>2026-06-09</span></div>
+      <h3>Constrain, validate, retry: why agent workflows fail like distributed systems</h3>
+      <p class="recap"><b>If you remember one thing:</b> agent failures are systems failures, so borrow the fixes from systems engineering.</p>
+      <div class="catchup">catch up · 6 cards · 90s</div>
+    </a>
+    <a class="mcard data" href="#">
+      <div class="meta"><span class="sw" style="width:8px;height:8px;border-radius:3px;background:var(--c-data)"></span><span>own-not-rent</span><span>·</span><span>2026-06-06</span></div>
+      <h3>Renting intelligence is a strategy. Just not yours.</h3>
+      <p class="recap"><b>If you remember one thing:</b> every frontier API call is a lease payment on your own roadmap.</p>
+      <div class="catchup">catch up · 5 cards · 75s</div>
+    </a>
+  </div>
+</section>
+
+<!-- VAULT -->
+<section class="vault">
+  <h2>The Vault</h2>
+  <p class="sub">Drops past their 72h window. Nothing is deleted: freshness is scarce, access is not.</p>
+  <div class="vgrid">
+    <a class="vcard" href="#"><div class="meta"><span style="width:7px;height:7px;border-radius:2px;background:var(--c-infra);display:inline-block"></span> edge-ai · jun 03</div><h3>Gemma 4 12B on a thin client: what edge acceleration actually buys you</h3></a>
+    <a class="vcard" href="#"><div class="meta"><span style="width:7px;height:7px;border-radius:2px;background:var(--c-mgmt);display:inline-block"></span> management · may 31</div><h3>1-Ns revisited: the black box model, ten years later</h3></a>
+    <a class="vcard" href="#"><div class="meta"><span style="width:7px;height:7px;border-radius:2px;background:var(--c-data);display:inline-block"></span> data-eng · may 28</div><h3>Vibe coding vs spec-driven pipelines: pick per blast radius</h3></a>
+  </div>
+</section>
+
+<section class="manifesto">
+  <h2>The void writes. The human signs. The clock is real.</h2>
+  <p>Datavoid runs on a 72-hour synthesis cycle: an interest graph fed by my own AI conversations, a writer trained on a decade of my posts, a critic that rejects anything that does not sound like me, and a carder that compresses every essay into a deck you can finish in two minutes. The countdown is not marketing, it is the cron schedule. The fast lane is complete on its own. Depth is always a choice.</p>
+</section>
+
+<footer>
+  <span>© 2026 Rui Machado · Vila Nova de Gaia</span>
+  <span class="mono">pipeline: writer › critic › carder › publish · cadence 72h · supervision on</span>
+</footer>
+
+</div>
+
+<script>
+/* ── countdown ring (the cron is the clock) ── */
+(function(){
+  const R=66, CIRC=2*Math.PI*R, TOTAL=72*3600;
+  const ring=document.getElementById('ring'), cd=document.getElementById('cd'), box=document.getElementById('ringbox');
+  ring.style.strokeDasharray=CIRC;
+  let next=Date.now()+(41*3600+23*60+9)*1000; /* prod: read fresh_until from deck JSON */
+  function tick(){
+    const s=Math.max(0,(next-Date.now())/1000|0);
+    const h=s/3600|0,m=(s%3600)/60|0,sec=s%60;
+    cd.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    ring.style.strokeDashoffset=CIRC*(1-s/TOTAL);
+    box.classList.toggle('hot',s<12*3600);
+  }
+  tick(); setInterval(tick,1000);
+})();
+
+/* ── deck progress dots ── */
+(function(){
+  const rail=document.getElementById('deckRail'), dots=document.getElementById('dots');
+  const cards=[...rail.querySelectorAll('.card')];
+  cards.forEach(()=>dots.appendChild(document.createElement('i')));
+  const is=[...dots.children]; is[0].classList.add('on');
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(e=>{ if(e.isIntersecting){
+      is.forEach(i=>i.classList.remove('on'));
+      is[cards.indexOf(e.target)].classList.add('on');
+    }});
+  },{root:rail,threshold:.6});
+  cards.forEach(c=>obs.observe(c));
+  rail.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+      e.preventDefault();
+      rail.scrollBy({left:(e.key==='ArrowRight'?1:-1)*440,behavior:'smooth'});
+    }
+  });
+})();
+
+/* ── reader streak ──
+   Preview-safe: in-memory only. On production hosting, replace `store`
+   with a persistent backend (e.g. localStorage or your own API). */
+(function(){
+  const store={streak:4,lastDrop:'dv-2026-06-09-77c2'};
+  const CURRENT='dv-2026-06-12-a3f1';
+  if(store.lastDrop!==CURRENT){ store.streak+=1; store.lastDrop=CURRENT; }
+  document.getElementById('streak').textContent=store.streak;
+})();
+</script>
+</body>
+</html>

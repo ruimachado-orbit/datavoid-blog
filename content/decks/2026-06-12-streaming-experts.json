@@ -1,0 +1,14 @@
+{
+  "drop_id": "dv-2026-06-12-a3f1",
+  "title": "Streaming experts: MoE under 16GB",
+  "topic": "moe-inference",
+  "fresh_until": "2026-06-15T07:00:00Z",
+  "cards": [
+    {"kind": "hook", "title": "Your GPU is hoarding", "body": "A 12B MoE model activates 3B parameters per token. The other 9B sit in VRAM doing nothing. That is the bug.", "seconds": 15},
+    {"kind": "core", "title": "Experts are a stream", "body": "Treat expert weights as data in flight, not furniture. Keep the router and attention on GPU, stream experts from RAM on demand.", "seconds": 20},
+    {"kind": "evidence", "title": "The numbers", "body": "Gemma-class MoE on a 16GB card: full GPU placement fails. Expert streaming runs at usable interactive speed.", "stat": {"value": "16GB", "label": "is enough"}, "seconds": 15},
+    {"kind": "code", "title": "One flag to start", "body": "llama.cpp already ships the primitive.", "code": "./llama-server -m model.gguf --cpu-moe", "seconds": 20},
+    {"kind": "takeaway", "title": "Placement is a choice", "body": "VRAM limits stop being a wall when you stop treating model layout as fixed. Routing locality decides what deserves the GPU.", "seconds": 20},
+    {"kind": "cta", "title": "Want the full picture?", "body": "The essay covers prefetch heuristics, expert cache hit rates and where this breaks. 7 honest minutes.", "seconds": 5}
+  ]
+}

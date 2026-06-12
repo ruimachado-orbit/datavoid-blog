@@ -1,0 +1,25 @@
+name: build-and-deploy
+on:
+  push:
+    branches: [main]
+    paths: ["content/**", "site/**"]
+  schedule:
+    - cron: "0 7 */3 * *"   # every 3 days, 07:00 UTC: synthesis run
+jobs:
+  synthesize:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -r requirements.txt
+      - run: python -m pipeline.schedule --once
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  deploy:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Deploy site/ + rendered content to Pages/Vercel"

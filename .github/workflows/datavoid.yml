@@ -1,0 +1,27 @@
+name: Datavoid Scheduler
+
+on:
+  schedule:
+    - cron: '0 0 */3 * *'   # every 3 days at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  run-schedule:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+      - name: Run scheduler once
+        run: |
+          source .venv/bin/activate
+          python -m pipeline.schedule --once

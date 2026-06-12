@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATAVOID — an autonomous publication</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#07090E;
+  --surface:#0E131C;
+  --line:#1B2330;
+  --text:#E9EDF4;
+  --muted:#8893A5;
+  --signal:#3CE0E0;
+  --signal-deep:#19A8A8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--void);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+canvas#field{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ── top bar ─────────────────────────────── */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px 0;border-bottom:1px solid var(--line);
+}
+.mark{display:flex;align-items:center;gap:12px}
+.mark .dv{
+  width:34px;height:34px;border-radius:9px;background:var(--signal);
+  color:var(--void);font-family:'Syne',sans-serif;font-weight:800;
+  display:grid;place-items:center;font-size:15px;letter-spacing:-.5px;
+}
+.mark span{font-family:'Syne',sans-serif;font-weight:800;letter-spacing:.04em;font-size:15px}
+nav{display:flex;gap:26px;font-size:13px;color:var(--muted)}
+nav a:hover{color:var(--signal)}
+
+/* ── hero ────────────────────────────────── */
+.hero{padding:84px 0 64px;display:grid;grid-template-columns:1.5fr 1fr;gap:48px;align-items:end}
+.hero h1{
+  font-family:'Syne',sans-serif;font-weight:800;
+  font-size:clamp(56px,9vw,108px);line-height:.95;letter-spacing:-.02em;
+}
+.hero h1 .v{color:var(--signal)}
+.tagline{margin-top:18px;color:var(--muted);font-size:15px}
+.tagline b{color:var(--text);font-weight:600}
+.hero-sub{margin-top:26px;max-width:46ch;color:var(--muted);font-size:15px}
+.hero-sub strong{color:var(--text);font-weight:600}
+
+/* telemetry panel: the machinery, visible */
+.telemetry{
+  border:1px solid var(--line);border-radius:14px;background:var(--surface);
+  padding:20px;font-size:12.5px;
+  box-shadow:0 -40px 80px -60px rgba(60,224,224,.35) inset;
+}
+.telemetry h2{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;
+  letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--signal);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.trow{display:flex;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line)}
+.trow .k{color:var(--muted)}
+.trow .val{font-family:'JetBrains Mono',monospace;color:var(--text)}
+.trow .val.sig{color:var(--signal)}
+#countdown{font-variant-numeric:tabular-nums}
+
+/* ── interests strip ─────────────────────── */
+.interests{padding:34px 0;border-top:1px solid var(--line)}
+.label{
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:18px;
+}
+.bars{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.bar .t{font-size:12.5px;margin-bottom:8px;color:var(--text)}
+.bar .track{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar .fill{height:100%;background:var(--signal);border-radius:2px;transform-origin:left;animation:grow 1.1s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleX(0)}}
+.bar .w{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:6px}
+
+/* ── feed ────────────────────────────────── */
+.feed{padding:48px 0 80px}
+.post{
+  border:1px solid var(--line);border-radius:14px;background:var(--surface);
+  padding:28px;margin-bottom:18px;transition:border-color .25s, transform .25s;
+}
+.post:hover{border-color:var(--signal-deep);transform:translateY(-2px)}
+.post .meta{display:flex;gap:14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap}
+.post .meta .tag{color:var(--signal)}
+.post h3{font-family:'Syne',sans-serif;font-weight:700;font-size:24px;line-height:1.2;letter-spacing:-.01em}
+.post p{margin-top:10px;color:var(--muted);font-size:14.5px;max-width:64ch}
+/* signature: provenance ribbon */
+.prov{
+  margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.prov .step{display:flex;align-items:center;gap:10px}
+.prov .step::after{content:"›";color:var(--signal-deep)}
+.prov .step:last-of-type::after{content:""}
+.prov .ok{color:var(--signal)}
+.prov .rid{margin-left:auto;color:var(--muted);opacity:.8}
+
+/* ── manifesto / footer ──────────────────── */
+.manifesto{
+  border-radius:16px;background:var(--signal);color:var(--void);
+  padding:48px;margin-bottom:60px;
+}
+.manifesto h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(26px,4vw,40px);line-height:1.1;letter-spacing:-.01em;max-width:22ch}
+.manifesto p{margin-top:14px;font-weight:500;font-size:15px;max-width:58ch}
+footer{padding:28px 0 48px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);flex-wrap:wrap;gap:10px}
+footer .mono{font-size:11px}
+
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr;padding-top:56px}
+  .bars{grid-template-columns:repeat(2,1fr)}
+  .manifesto{padding:32px}
+  nav{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  canvas#field{display:none}
+}
+:focus-visible{outline:2px solid var(--signal);outline-offset:3px;border-radius:4px}
+</style>
+</head>
+<body>
+<canvas id="field" aria-hidden="true"></canvas>
+<div class="wrap">
+
+<header>
+  <a class="mark" href="#"><span class="dv">DV</span><span>DATAVOID</span></a>
+  <nav aria-label="Main">
+    <a href="#feed">Essays</a>
+    <a href="#interests">Interest graph</a>
+    <a href="#about">How it works</a>
+    <a href="https://www.linkedin.com/in/rpmachado">Rui</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div>
+    <h1>DATA<span class="v">VOID</span></h1>
+    <p class="tagline mono">data &gt; code &gt; <b>enlightening</b></p>
+    <p class="hero-sub">An autonomous publication. Every three days, an agent pipeline digests what <strong>Rui Machado</strong> has been thinking about, researches it, and writes the essay. Rui supervises. The machinery is on display below, run by run.</p>
+  </div>
+  <aside class="telemetry" aria-label="Agent status">
+    <h2><span class="dot"></span> agent status · live</h2>
+    <div class="trow"><span class="k">pipeline</span><span class="val sig">idle · healthy</span></div>
+    <div class="trow"><span class="k">last run</span><span class="val">dv-2026-06-12-a3f1</span></div>
+    <div class="trow"><span class="k">critic loops</span><span class="val">2 / 3</span></div>
+    <div class="trow"><span class="k">supervision</span><span class="val sig">human gate on</span></div>
+    <div class="trow"><span class="k">next synthesis</span><span class="val" id="countdown">2d 14h 09m</span></div>
+  </aside>
+</section>
+
+<section class="interests" id="interests">
+  <div class="label">interest graph · derived from hermes conversations · 30-day half-life decay</div>
+  <div class="bars">
+    <div class="bar"><div class="t">MoE inference</div><div class="track"><div class="fill" style="width:87%"></div></div><div class="w">0.87</div></div>
+    <div class="bar"><div class="t">Agentic orchestration</div><div class="track"><div class="fill" style="width:81%;animation-delay:.08s"></div></div><div class="w">0.81</div></div>
+    <div class="bar"><div class="t">AI reliability</div><div class="track"><div class="fill" style="width:74%;animation-delay:.16s"></div></div><div class="w">0.74</div></div>
+    <div class="bar"><div class="t">Own-not-rent infra</div><div class="track"><div class="fill" style="width:68%;animation-delay:.24s"></div></div><div class="w">0.68</div></div>
+    <div class="bar"><div class="t">Analytics engineering</div><div class="track"><div class="fill" style="width:55%;animation-delay:.32s"></div></div><div class="w">0.55</div></div>
+  </div>
+</section>
+
+<main class="feed" id="feed">
+  <div class="label">essays · machine-written, human-supervised</div>
+
+  <article class="post">
+    <div class="meta"><span>2026-06-12</span><span class="tag">moe-inference</span><span class="tag">edge-ai</span><span>7 min</span></div>
+    <h3><a href="#">Streaming experts: running MoE models under 16GB of VRAM</a></h3>
+    <p>Expert weights do not need to live on the GPU. What happens when you treat the expert layer as a streaming problem instead of a placement problem, and what llama.cpp's cpu-moe flag gets right.</p>
+    <div class="prov">
+      <span class="step">ingest <span class="ok">✓</span></span>
+      <span class="step">interests <span class="ok">✓</span></span>
+      <span class="step">draft ×2</span>
+      <span class="step">critic <span class="ok">approve</span></span>
+      <span class="step">rui <span class="ok">approve</span></span>
+      <span class="rid">run dv-2026-06-12-a3f1</span>
+    </div>
+  </article>
+
+  <article class="post">
+    <div class="meta"><span>2026-06-09</span><span class="tag">ai-reliability</span><span class="tag">agentic</span><span>9 min</span></div>
+    <h3><a href="#">Constrain, validate, retry: why agent workflows fail like distributed systems</a></h3>
+    <p>Agent failures are not model failures, they are systems failures. Five engineering principles borrowed from twenty years of distributed computing, applied to LLM pipelines in production.</p>
+    <div class="prov">
+      <span class="step">ingest <span class="ok">✓</span></span>
+      <span class="step">interests <span class="ok">✓</span></span>
+      <span class="step">draft ×3</span>
+      <span class="step">critic <span class="ok">approve</span></span>
+      <span class="step">rui <span class="ok">approve</span></span>
+      <span class="rid">run dv-2026-06-09-77c2</span>
+    </div>
+  </article>
+
+  <article class="post">
+    <div class="meta"><span>2026-06-06</span><span class="tag">own-not-rent</span><span class="tag">governance</span><span>6 min</span></div>
+    <h3><a href="#">Renting intelligence is a strategy. Just not yours.</a></h3>
+    <p>Every API call to a frontier model is a small lease payment on your own roadmap. Where the ownership line actually sits for a mid-size enterprise, with numbers.</p>
+    <div class="prov">
+      <span class="step">ingest <span class="ok">✓</span></span>
+      <span class="step">interests <span class="ok">✓</span></span>
+      <span class="step">draft ×1</span>
+      <span class="step">critic <span class="ok">approve</span></span>
+      <span class="step">rui <span class="ok">approve</span></span>
+      <span class="rid">run dv-2026-06-06-b914</span>
+    </div>
+  </article>
+</main>
+
+<section class="manifesto" id="about">
+  <h2>The void writes. The human signs.</h2>
+  <p>Datavoid v2 is an experiment in supervised autonomy: an interest graph fed by my own AI conversations, a writer agent trained on a decade of my posts, a critic that rejects anything that does not sound like me, and a human gate before anything ships. Every essay carries its full provenance. If the machine wrote something I would not stand behind, it does not get published.</p>
+</section>
+
+<footer>
+  <span>© 2026 Rui Machado · Vila Nova de Gaia</span>
+  <span class="mono">writer: claude-sonnet-4-6 · cadence: 72h · supervision: on</span>
+</footer>
+
+</div>
+
+<script>
+// countdown to next synthesis (72h cycle)
+(function(){
+  const el=document.getElementById('countdown');
+  let next=Date.now()+ (2*86400+14*3600+9*60)*1000;
+  function tick(){
+    let s=Math.max(0,(next-Date.now())/1000|0);
+    const d=s/86400|0, h=(s%86400)/3600|0, m=(s%3600)/60|0;
+    el.textContent=`${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m`;
+  }
+  tick(); setInterval(tick,30000);
+})();
+
+// ambient drifting data field
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c=document.getElementById('field'), x=c.getContext('2d');
+  let w,h,pts=[];
+  function size(){w=c.width=innerWidth;h=c.height=innerHeight;
+    pts=Array.from({length:Math.min(90,w/14|0)},()=>({
+      x:Math.random()*w,y:Math.random()*h,
+      vx:(Math.random()-.5)*.12,vy:(Math.random()-.5)*.12,
+      r:Math.random()*1.2+.3,a:Math.random()*.35+.08}));}
+  size(); addEventListener('resize',size);
+  (function loop(){
+    x.clearRect(0,0,w,h);
+    for(const p of pts){
+      p.x=(p.x+p.vx+w)%w; p.y=(p.y+p.vy+h)%h;
+      x.beginPath(); x.arc(p.x,p.y,p.r,0,7);
+      x.fillStyle=`rgba(60,224,224,${p.a})`; x.fill();
+    }
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>
