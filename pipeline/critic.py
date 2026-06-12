@@ -6,7 +6,7 @@ import openai, yaml, pathlib
 from .config import CFG
 
 def review(draft: str):
-    client = openai.OpenAI(api_key=CFG.api_key, base_url=CFG.base_url)
+    client = openai.OpenAI(api_key=CFG.api_key)
     system = pathlib.Path("prompts/critic.md").read_text()
     response = client.chat.completions.create(
         model=CFG.critic_model,
