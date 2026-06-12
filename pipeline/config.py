@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Config:
-    api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
+    api_key: str = os.getenv("ANTHROPIC_API_KEY", os.getenv("OPENAI_API_KEY", ""))
     hermes_dir: str = os.getenv("HERMES_EXPORT_DIR", "data/hermes")
     cycle_days: int = int(os.getenv("CYCLE_DAYS", "3"))
     approval_gate: bool = os.getenv("APPROVAL_GATE", "true") == "true"
