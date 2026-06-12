@@ -7,8 +7,8 @@ class Config:
     hermes_dir: str = os.getenv("HERMES_EXPORT_DIR", "data/hermes")
     cycle_days: int = int(os.getenv("CYCLE_DAYS", "3"))
     approval_gate: bool = os.getenv("APPROVAL_GATE", "true") == "true"
-    writer_model: str = "claude-sonnet-4-6"
-    critic_model: str = "claude-sonnet-4-6"
+    writer_model: str = "gpt-4o"
+    critic_model: str = "gpt-4o"
     max_loops: int = 3
     runs_dir: str = "runs"
     posts_dir: str = "content/posts"

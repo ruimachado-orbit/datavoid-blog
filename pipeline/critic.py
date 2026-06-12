@@ -2,16 +2,17 @@
 
 Returns ("APPROVE", "") or ("REVISE", notes).
 """
-import anthropic, pathlib
+import openai, yaml, pathlib
 from .config import CFG
 
 def review(draft: str):
-    client = anthropic.Anthropic(api_key=CFG.api_key)
+    openai.api_key = CFG.api_key
     system = pathlib.Path("prompts/critic.md").read_text()
-    msg = client.messages.create(
-        model=CFG.critic_model, max_tokens=1500,
-        system=system, messages=[{"role": "user", "content": draft}])
-    text = msg.content[0].text
+    response = openai.ChatCompletion.create(
+        model=CFG.critic_model,
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": draft}],
+        max_tokens=1500)
+    text = response.choices[0].message.content
     if text.strip().startswith("APPROVE"):
         return "APPROVE", ""
     return "REVISE", text
